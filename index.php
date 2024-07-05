@@ -1,36 +1,18 @@
-<?php
+<!DOCTYPE html>
+<html lang="en">
 
-// Database credentials (replace with your actual details)
-$host = "localhost";
-$db_name = "your_database_name";
-$username = "your_username";
-$password = "your_password";
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Web App</title>
+</head>
 
-// Connect to the database
-try {
-  $conn = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  echo "Connected to database successfully!";
-} catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
-}
+<body>
+    <!-- <h1>Sample application</h1> -->
+    <p>Your current date and time is
+        <?php echo date('Y-m-d H:i:s'); ?>
+    </p>
+    <?php include('connect.php'); // Include the PHP script ?>
+</body>
 
-// (Optional) Perform a simple query (replace with your desired query)
-$sql = "SELECT * FROM users";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$result = $stmt->fetchAll();
-
-// (Optional) Process the query results (example: print usernames)
-if(count($result) > 0) {
-  echo "<br> Usernames: <br>";
-  foreach($result as $row) {
-    echo "- " . $row["username"] . "<br>";
-  }
-} else {
-  echo "<br> No users found.";
-}
-
-$conn = null; // Close the connection
-
-?>
+</html>
