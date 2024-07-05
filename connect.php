@@ -1,39 +1,26 @@
 <?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "school_db";
 
-echo "<p>This is just a paragraph</p>";
-
-// Database credentials (replace with your actual details)
-$host = "localhost";
-$db_name = "Rental";
-$username = "your_username";
-$password = "your_password";
-
-echo $host;
-// Connect to the database
-try {
-  $conn = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  echo "Connected to database successfully!";
-} catch(PDOException $e) {
-  echo "Connection failed: " . $e->getMessage();
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
 }
 
-// (Optional) Perform a simple query (replace with your desired query)
-$sql = "SELECT * FROM users";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$result = $stmt->fetchAll();
+$sql = "SELECT StudentId, FName, LName FROM student";
+$result = $conn->query($sql);
 
-// (Optional) Process the query results (example: print usernames)
-if(count($result) > 0) {
-  echo "<br> Usernames: <br>";
-  foreach($result as $row) {
-    echo "- " . $row["username"] . "<br>";
+if ($result->num_rows > 0) {
+  // output data of each row
+  while($row = $result->fetch_assoc()) {
+    echo $row["StudentId"]. " - Name: " . $row["FName"]. " " . $row["LName"]. "<br>";
   }
 } else {
-  echo "<br> No users found.";
+  echo "0 results";
 }
-
-$conn = null; // Close the connection
-
+$conn->close();
 ?>
