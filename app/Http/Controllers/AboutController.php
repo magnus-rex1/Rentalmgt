@@ -7,14 +7,14 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class PropertyController extends Controller
+class AboutController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(): Response
     {
-        return Inertia::render('Properties/Index', [
+        return Inertia::render('About/Index', [
 
         ]);
     }
