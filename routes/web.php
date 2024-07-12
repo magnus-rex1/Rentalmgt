@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\RentalController;
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -24,4 +26,11 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::resource('rentals', RentalController::class)
+    ->only(['index', 'store'])
+    ->middleware(['auth', 'verified']);
+
+Route::resource('about', AboutController::class)
+    ->only(['index'])
+    ->middleware(['auth', 'verified']);
+require __DIR__ . '/auth.php';
