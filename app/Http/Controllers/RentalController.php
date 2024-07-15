@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Property;
+use App\Models\Rental;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,7 @@ class RentalController extends Controller
     public function index(): Response
     {
         return Inertia::render('Rentals/Index', [
-            'image' => Storage::url('images/house1.jpg'),
+            'rentals' => Rental::with('user:id,name')->first()->get(),
         ]);
     }
 
@@ -31,15 +32,26 @@ class RentalController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-        //
+        $validated = $request->validate([
+            'address' => 'required|string|max:255',
+            'type' => 'required|string|max:10',
+            'size' => 'required|integer|numeric',
+            'bedrooms' => 'required|integer|numeric',
+            'rent' => 'required|integer|numeric',
+            'available' => 'required|boolean'
+        ]);
+
+        $request->user()->rentals()->create($validated);
+
+        return redirect(route('rentals.index'));
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Property $property)
+    public function show(Rental $rental)
     {
         //
     }
@@ -47,7 +59,7 @@ class RentalController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Property $property)
+    public function edit(Rental $rental)
     {
         //
     }
@@ -55,7 +67,7 @@ class RentalController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Property $property)
+    public function update(Request $request, Rental $rental)
     {
         //
     }
@@ -63,7 +75,7 @@ class RentalController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Property $property)
+    public function destroy(Rental $rental)
     {
         //
     }
