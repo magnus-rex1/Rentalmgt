@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Rental;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
@@ -26,7 +27,7 @@ class RentalController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('Rentals/Create');
     }
 
     /**
@@ -61,7 +62,9 @@ class RentalController extends Controller
      */
     public function edit(Rental $rental)
     {
-        //
+        return Inertia::render('Rentals/Edit', [
+            'rental' => $rental,
+        ]);
     }
 
     /**
@@ -75,8 +78,11 @@ class RentalController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Rental $rental)
+    public function destroy(Rental $rental): RedirectResponse
     {
-        //
+        // Gate::authorize('delete', $rental);
+        $rental->delete();
+
+        return redirect(route('rentals.index'));
     }
 }

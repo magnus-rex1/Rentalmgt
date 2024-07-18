@@ -4,6 +4,7 @@ use App\Http\Controllers\RentalController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
+use Illuminate\Routing\RouteRegistrar;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,7 +28,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('rentals', RentalController::class)
-    ->only(['index', 'store'])
+    ->only(['index', 'store', 'create', 'edit', 'destroy'])
     ->middleware(['auth', 'verified']);
 
 Route::resource('about', AboutController::class)
