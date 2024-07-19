@@ -5,7 +5,7 @@ import PrimaryButton from "@/Components/PrimaryButton";
 import { useForm, Head, router } from '@inertiajs/react';
 
 export default function add({ auth, rental }) {
-    const { data, setData, post, processing, reset, errors } = useForm({
+    const { data, setData, put, processing, errors } = useForm({
         address: rental.address || '',
         type: rental.type || '',
         size: rental.size || '',
@@ -16,7 +16,8 @@ export default function add({ auth, rental }) {
 
     function submit(e) {
         e.preventDefault();
-        // post(route('rentals.store'), { onSuccess: () => reset() });
+        // post(route('rentals.update'));
+        put(route('rentals.update', rental.id));
     }
 
     function destroy() {
@@ -43,7 +44,7 @@ export default function add({ auth, rental }) {
                                     className="form-control block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                                     type="text"
                                     id="address"
-                                    value={rental.address}
+                                    value={data.address}
                                     onChange={e => setData('address', e.target.value)}
                                     name="address"
                                     placeholder="Enter property address" />
@@ -56,7 +57,7 @@ export default function add({ auth, rental }) {
                                     className="form-control block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                                     type="text"
                                     id="type"
-                                    value={rental.type}
+                                    value={data.type}
                                     onChange={e => setData('type', e.target.value)}
                                     name="type"
                                     placeholder="Enter property type" />
@@ -69,7 +70,7 @@ export default function add({ auth, rental }) {
                                     className="form-control block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                                     type="text"
                                     id="size"
-                                    value={rental.size}
+                                    value={data.size}
                                     onChange={e => setData('size', e.target.value)}
                                     name="size"
                                     placeholder="Enter property size" />
@@ -82,7 +83,7 @@ export default function add({ auth, rental }) {
                                     className="form-control block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                                     type="text"
                                     id="bedrooms"
-                                    value={rental.bedrooms}
+                                    value={data.bedrooms}
                                     onChange={e => setData('bedrooms', e.target.value)}
                                     name="bedrooms"
                                     placeholder="Enter number of bedrooms" />
@@ -95,7 +96,7 @@ export default function add({ auth, rental }) {
                                     className="form-control block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                                     type="text"
                                     id="rent"
-                                    value={rental.rent}
+                                    value={data.rent}
                                     onChange={e => setData('rent', e.target.value)}
                                     name="rent"
                                     placeholder="Enter rent amount" />
@@ -108,7 +109,7 @@ export default function add({ auth, rental }) {
                                     className="form-control block w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm"
                                     type="text"
                                     id="available"
-                                    value={rental.available}
+                                    value={data.available}
                                     onChange={e => setData('available', e.target.value)}
                                     name="available"
                                     placeholder="(yes/no)" />
@@ -118,7 +119,7 @@ export default function add({ auth, rental }) {
                         </div>
                         <div className="flex items-center p-8">
                             <InputError message={errors.message} className="mt-2" />
-                            <button href={route('rentals.destroy', rental.id)} onClick={destroy} type="button" className="btn btn-danger uppercase font-semibold text-xs">Delete</button>
+                            <button onClick={destroy} type="button" className="btn btn-danger uppercase font-semibold text-xs">Delete</button>
                             <PrimaryButton className="ml-auto" disabled={processing}>Update</PrimaryButton>
                         </div>
                     </form>
