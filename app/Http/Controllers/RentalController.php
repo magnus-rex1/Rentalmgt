@@ -6,6 +6,7 @@ use App\Models\Rental;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Storage;
@@ -72,7 +73,19 @@ class RentalController extends Controller
      */
     public function update(Request $request, Rental $rental)
     {
-        //
+        $validated = $request->validate([
+            'address' => 'required|string|max:255',
+            'type' => 'required|string|max:10',
+            'size' => 'required|integer|numeric',
+            'bedrooms' => 'required|integer|numeric',
+            'rent' => 'required|integer|numeric',
+            'available' => 'required|boolean'
+        ]);
+
+        $rental->update($validated);
+
+        // return Redirect::back()->with('success', 'Property updated.');
+        return redirect(route('rentals.index'));
     }
 
     /**
@@ -84,5 +97,6 @@ class RentalController extends Controller
         $rental->delete();
 
         return redirect(route('rentals.index'));
+        // return Redirect::back()->with('success', 'Property deleted.');
     }
 }

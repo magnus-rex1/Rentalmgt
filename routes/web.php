@@ -28,7 +28,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('rentals', RentalController::class)
-    ->only(['index', 'store', 'create', 'edit', 'destroy'])
+    ->only(['index', 'store', 'create', 'edit', 'destroy', 'update'])
     ->middleware(['auth', 'verified']);
 
 Route::resource('about', AboutController::class)
