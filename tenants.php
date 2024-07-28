@@ -1,90 +1,9 @@
-<?php
-
-  session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-
-// db_connect.php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "rental_db";
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$sql_tenants = "SELECT COUNT(*) AS total_tenants FROM tenants";
-$result_tenants = $conn->query($sql_tenants);
-
-if ($result_tenants && $result_tenants->num_rows > 0) {
-    $row_tenants = $result_tenants->fetch_assoc();
-    $total_tenants = $row_tenants['total_tenants'];
-} else {
-    $total_tenants = 0;
-}
-
-// Fetch total rentals
-$sql_rentals = "SELECT COUNT(*) AS total_rentals FROM rentals";
-$result_rentals = $conn->query($sql_rentals);
-
-if ($result_rentals && $result_rentals->num_rows > 0) {
-    $row_rentals = $result_rentals->fetch_assoc();
-    $total_rentals = $row_rentals['total_rentals'];
-} else {
-    $total_rentals = 0;
-}
-
-// Fetch total empty rentals
-$sql_empty_rentals = "SELECT SUM(empty_rooms) AS total_empty_rentals FROM rentals";
-$result_empty_rentals = $conn->query($sql_empty_rentals);
-
-if ($result_empty_rentals && $result_empty_rentals->num_rows > 0) {
-    $row_empty_rentals = $result_empty_rentals->fetch_assoc();
-    $total_empty_rentals = $row_empty_rentals['total_empty_rentals'];
-} else {
-    $total_empty_rentals = 0;
-}
-
-
-// Fetch total rooms
-$sql_total_rooms = "SELECT SUM(total_rooms) AS total_rooms FROM rentals";
-$result_total_rooms = $conn->query($sql_total_rooms);
-
-if ($result_total_rooms && $result_total_rooms->num_rows > 0) {
-    $row_total_rooms = $result_total_rooms->fetch_assoc();
-    $total_rooms = $row_total_rooms['total_rooms'];
-} else {
-    $total_rooms = 0;
-}
-
-// Fetch total bookings
-$sql_bookings = "SELECT COUNT(*) AS total_bookings FROM bookings";
-$result_bookings = $conn->query($sql_bookings);
-
-if ($result_bookings && $result_bookings->num_rows > 0) {
-    $row_bookings = $result_bookings->fetch_assoc();
-    $total_bookings = $row_bookings['total_bookings'];
-} else {
-    $total_bookings = 0;
-}
-
-?>
-
 <!DOCTYPE html>
 <html :class="{ 'theme-dark': dark }" x-data="data()" lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-
-    <title>Urban Rent Dashboard</title>
+    <title>UrbanRent - Tenants</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
@@ -95,79 +14,11 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
       defer
     ></script>
     <script src="./assets/js/init-alpine.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css"
-    />
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"
-      defer
-    ></script>
-    <script src="./assets/js/charts-lines.js" defer></script>
-    <script src="./assets/js/charts-pie.js" defer></script>
   </head>
-      <!-- Existing head content -->
-    <style>
-        .status-button {
-            color: white;
-            border: none;
-            border-radius: 0.25rem;
-            cursor: pointer;
-        }
-        .status-settled {
-            background-color: #38a169; /* Green */
-        }
-        .status-pending {
-            background-color: #e53e3e; /* Red */
-        }
-        .fade-out {
-            animation: fadeOut 3s forwards;
-        }
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        /* Modal styles */
-        .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 5; 
-            padding-top: 60px; 
-            left: 10%;
-            top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.4); 
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 60%;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
   <body>
     <div
       class="flex h-screen bg-gray-50 dark:bg-gray-900"
-      :class="{ 'overflow-hidden': isSideMenuOpen }"
+      :class="{ 'overflow-hidden': isSideMenuOpen}"
     >
       <!-- Desktop sidebar -->
       <aside
@@ -180,15 +31,13 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
           >
             UrbanRent
           </a>
+          
+
           <ul class="mt-6">
             <li class="relative px-6 py-3">
-              <span
-                class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg"
-                aria-hidden="true"
-              ></span>
               <a
-                class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-100"
-                href="index.html"
+                class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                href="index.php"
               >
                 <svg
                   class="w-5 h-5"
@@ -232,8 +81,12 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
               </a>
             </li>
             <li class="relative px-6 py-3">
+              <span
+                class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg"
+                aria-hidden="true"
+              ></span>
               <a
-                class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-100"
                 href="tenants.php"
               >
                 <svg
@@ -253,7 +106,7 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
                 <span class="ml-4">Tenants</span>
               </a>
             </li>
-              
+            
             <li class="relative px-6 py-3">
               <button
                 class="inline-flex items-center justify-between w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
@@ -319,18 +172,18 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
                 </ul>
               </template>
             </li>
+    
           </ul>
           <div class="px-6 my-6">
             <a
               class="flex items-center justify-between w-full px-4 py-2 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-lg active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
               href="add_admin.php"
             >
-              Add Admin Account
+              Add Admin account
               <span class="ml-2" aria-hidden="true">+</span>
             </a>
             <p><a href="logout.php">Logout</a></p>
           </div>
-
         </div>
       </aside>
       <!-- Mobile sidebar -->
@@ -366,13 +219,9 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
           </a>
           <ul class="mt-6">
             <li class="relative px-6 py-3">
-              <span
-                class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg"
-                aria-hidden="true"
-              ></span>
               <a
-                class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-100"
-                href="index.html"
+                class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                href="index.php"
               >
                 <svg
                   class="w-5 h-5"
@@ -412,12 +261,16 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
                   ></path>
                 </svg>
-                <span class="ml-4">Forms</span>
+                <span class="ml-4">Tenants</span>
               </a>
             </li>
             <li class="relative px-6 py-3">
+              <span
+                class="absolute inset-y-0 left-0 w-1 bg-purple-600 rounded-tr-lg rounded-br-lg"
+                aria-hidden="true"
+              ></span>
               <a
-                class="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200"
+                class="inline-flex items-center w-full text-sm font-semibold text-gray-800 transition-colors duration-150 hover:text-gray-800 dark:hover:text-gray-200 dark:text-gray-100"
                 href="cards.html"
               >
                 <svg
@@ -434,7 +287,7 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                   ></path>
                 </svg>
-                <span class="ml-4">Cards</span>
+                <span class="ml-4">Tenants</span>
               </a>
             </li>
             <li class="relative px-6 py-3">
@@ -614,7 +467,14 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
           </div>
         </div>
       </aside>
-      <div class="flex flex-col flex-1 w-full">
+      
+
+
+
+
+
+
+      <div class="flex flex-col flex-1">
         <header class="z-10 py-4 bg-white shadow-md dark:bg-gray-800">
           <div
             class="container flex items-center justify-between h-full px-6 mx-auto text-purple-600 dark:text-purple-300"
@@ -660,14 +520,11 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
                 <input
                   class="w-full pl-8 pr-2 text-sm text-gray-700 placeholder-gray-600 bg-gray-100 border-0 rounded-md dark:placeholder-gray-500 dark:focus:shadow-outline-gray dark:focus:placeholder-gray-600 dark:bg-gray-700 dark:text-gray-200 focus:placeholder-gray-500 focus:bg-white focus:border-purple-300 focus:outline-none focus:shadow-outline-purple form-input"
                   type="text"
-                  placeholder="Search"
+                  placeholder="Search for projects"
                   aria-label="Search"
                 />
               </div>
             </div>
-
-            <h2>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
-
             <ul class="flex items-center flex-shrink-0 space-x-6">
               <!-- Theme toggler -->
               <li class="flex">
@@ -737,6 +594,7 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
                     @click.away="closeNotificationsMenu"
                     @keydown.escape="closeNotificationsMenu"
                     class="absolute right-0 w-56 p-2 mt-2 space-y-2 text-gray-600 bg-white border border-gray-100 rounded-md shadow-md dark:text-gray-300 dark:border-gray-700 dark:bg-gray-700"
+                    aria-label="submenu"
                   >
                     <li class="flex">
                       <a
@@ -874,15 +732,15 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
             </ul>
           </div>
         </header>
-        <main class="h-full overflow-y-auto">
+        <main class="h-full pb-16 overflow-y-auto">
           <div class="container px-6 mx-auto grid">
             <h2
               class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200"
             >
-              Dashboard
+              Tenants Management
             </h2>
             <!-- CTA -->
-            <button
+           <span
               class="flex items-center justify-between p-4 mb-8 text-sm font-semibold text-purple-100 bg-purple-600 rounded-lg shadow-md focus:outline-none focus:shadow-outline-purple"
             >
               <div class="flex items-center">
@@ -897,306 +755,70 @@ if ($result_bookings && $result_bookings->num_rows > 0) {
                 </svg>
                 <span>Manage and track your rental properties efficiently and effortlessly here.</span>
               </div>
-            </button>
+            </span>
+          
+            <!-- General elements -->
+            <h4
+              class="mb-4 text-lg font-semibold text-gray-600 dark:text-gray-300"
+            >
+              List of Tenants
+            </h4>
+            <div class="w-full overflow-x-auto">
 
-            <!-- Cards -->
-            <div class="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
-              <!-- Card -->
-              <div
-                class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800"
-              >
-                <div
-                  class="p-3 mr-4 text-orange-500 bg-orange-100 rounded-full dark:text-orange-100 dark:bg-orange-500"
-                >
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"
-                    ></path>
-                  </svg>
-                </div>
-                <div>
-                  <p
-                    class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
-                  >
-                    Total Rentals
-                  </p>
-                  <p
-                    class="text-lg font-semibold text-gray-700 dark:text-gray-200"
-                  >
-                  <?php echo $total_rentals; ?>
-                  </p>
-                </div>
-              </div>
-              <!-- Card -->
-              <div
-                class="flex items-center p-2 bg-white rounded-lg shadow-xs dark:bg-gray-800"
-              >
-                <div
-                  class="p-3 mr-4 text-green-500 bg-green-100 rounded-full dark:text-green-100 dark:bg-green-500"
-                >
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                </div>
-                <div>
-                  <p
-                    class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
-                  >
-                    Total Tenants
-                  </p>
-                  <p
-                    class="text-lg font-semibold text-gray-700 dark:text-gray-200"
-                  >
-
-            <?php echo $total_tenants; ?>
-
-                  </p>
-                </div>
-              </div>
-
-
-                <!-- Card -->
-              <div
-                class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800"
-              >
-                <div
-                  class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full dark:text-blue-100 dark:bg-blue-500"
-                >
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
-                    ></path>
-                  </svg>
-                </div>
-                <div>
-                  <p
-                    class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
-                  >
-                    Total Rooms
-                  </p>
-                  <p
-                    class="text-lg font-semibold text-gray-700 dark:text-gray-200"
-                  >
-                    <?php echo $total_rooms; ?>
-                  </p>
-                </div>
-              </div>
-
-
-              <!-- Card -->
-              <div
-                class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800"
-              >
-                <div
-                  class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full dark:text-blue-100 dark:bg-blue-500"
-                >
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
-                    ></path>
-                  </svg>
-                </div>
-                <div>
-                  <p
-                    class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
-                  >
-                    Empty Rooms
-                  </p>
-                  <p
-                    class="text-lg font-semibold text-gray-700 dark:text-gray-200"
-                  >
-                    <?php echo $total_empty_rentals; ?>
-                  </p>
-                </div>
-              </div>
-              <!-- Card -->
-              <div
-                class="flex items-center p-4 bg-white rounded-lg shadow-xs dark:bg-gray-800"
-              >
-                <div
-                  class="p-3 mr-4 text-teal-500 bg-teal-100 rounded-full dark:text-teal-100 dark:bg-teal-500"
-                >
-                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fill-rule="evenodd"
-                      d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM7 8H5v2h2V8zm2 0h2v2H9V8zm6 0h-2v2h2V8z"
-                      clip-rule="evenodd"
-                    ></path>
-                  </svg>
-                </div>
-                <div>
-                  <p
-                    class="mb-2 text-sm font-medium text-gray-600 dark:text-gray-400"
-                  >
-                    Pending Bookings
-                  </p>
-                  <p
-                    class="text-lg font-semibold text-gray-700 dark:text-gray-200"
-                  >
-                    <?php echo $total_bookings; ?>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- New Table -->
-            <div class="w-full overflow-hidden rounded-lg shadow-xs">
-              <div class="w-full overflow-x-auto">
 
 <?php
-// Handle delete action
-if (isset($_POST['action']) && $_POST['action'] == 'delete') {
-    $booker_id = $_POST['booker_id'];
-    $stmt = $conn->prepare("DELETE FROM bookings WHERE booker_id = ?");
-    $stmt->bind_param("i", $booker_id);
-    $stmt->execute();
-    $stmt->close();
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "rental_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle status toggle action
-if (isset($_POST['action']) && $_POST['action'] == 'toggle_status') {
-    $booker_id = $_POST['booker_id'];
-    $current_status = $_POST['current_status'];
-    $new_status = ($current_status == 'Pending') ? 'Settled' : 'Pending';
-    $stmt = $conn->prepare("UPDATE bookings SET status = ? WHERE booker_id = ?");
-    $stmt->bind_param("si", $new_status, $booker_id);
-    $stmt->execute();
-    $stmt->close();
-}
-
-// Handle edit action
-if (isset($_POST['action']) && $_POST['action'] == 'edit') {
-    $booker_id = $_POST['booker_id'];
-    $booker_name = $_POST['booker_name'];
-    $location = $_POST['location'];
-    $booker_contact = $_POST['booker_contact'];
-    $stmt = $conn->prepare("UPDATE bookings SET booker_name = ?, location = ?, booker_contact = ? WHERE booker_id = ?");
-    $stmt->bind_param("sssi", $booker_name, $location, $booker_contact, $booker_id);
-    $stmt->execute();
-    $stmt->close();
-}
-
-// Fetch records
-$sql = "SELECT * FROM bookings";
+$sql = "SELECT * FROM tenants";
 $result = $conn->query($sql);
-?>
-<table class="w-full rounded-lg shadow overflow-x-auto">
-    <thead>
-        <tr class="bg-gray-800 text-left">
-            <th class="px-2">Booker ID</th>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Contact</th>
+
+if ($result->num_rows > 0) {
+    echo "<table border='1'>";
+    echo "<tr>
+            <th>Tenant ID</th>
+            <th>Tenant Name</th>
+            <th>Occupying</th>
+            <th>Departs On</th>
             <th>Date Added</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php while ($row = $result->fetch_assoc()): ?>
-            <tr>
-                <td class="px-2"><?php echo htmlspecialchars($row['booker_id']); ?></td>
-                <td><?php echo htmlspecialchars($row['booker_name']); ?></td>
-                <td><?php echo htmlspecialchars($row['location']); ?></td>
-                <td><?php echo htmlspecialchars($row['booker_contact']); ?></td>
-                <td><?php echo htmlspecialchars($row['date_added']); ?></td>
-                <td>
-                    <form method="POST" action="index.php" class="inline">
-                        <input type="hidden" name="action" value="toggle_status">
-                        <input type="hidden" name="booker_id" value="<?php echo $row['booker_id']; ?>">
-                        <input type="hidden" name="current_status" value="<?php echo htmlspecialchars($row['status']); ?>">
-                        <button type="submit" class="<?php echo htmlspecialchars($row['status']) == 'Settled' ? 'text-blue-500' : 'bg-blue-500'; ?> text-white py-1 px-2 rounded">
-                            <?php echo htmlspecialchars($row['status']); ?>
-                        </button>
-                    </form>
-                </td>
-                <td>
-                    <div class="flex space-x-2">
-                        <button class="py-1 px-2 rounded" onclick="editRecord('<?php echo $row['booker_id']; ?>', '<?php echo htmlspecialchars($row['booker_name']); ?>', '<?php echo htmlspecialchars($row['location']); ?>', '<?php echo htmlspecialchars($row['booker_contact']); ?>')">Edit</button>
-                        <form method="POST" action="index.php" class="inline">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="hidden" name="booker_id" value="<?php echo $row['booker_id']; ?>">
-                            <button type="submit" class="text-red py-1 px-2 rounded" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-        <?php endwhile; ?>
-    </tbody>
-</table>
+          </tr>";
+    
+    // Output data of each row
+        while($row = $result->fetch_assoc()) {
+        echo "<tr>
+                <td>" . $row["tenant_id"] . "</td>
+                <td>" . $row["tenant_name"] . "</td>
+                <td>" . $row["rental"] . "</td>
+                <td>" . $row["departs"] . "</td>
+                <td>" . $row["date_added"] . "</td>
+              </tr>";
+    }
+    echo "</table>";
+} else {
+    echo "0 results";
+}
 
-
-<!-- Edit Modal -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>Edit Record</h2>
-        <form method="POST" action="index.php">
-            <input type="hidden" name="action" value="edit">
-            <input type="hidden" name="booker_id" id="booker_id">
-            <label for="booker_name">Name:</label>
-            <input type="text" name="booker_name" id="booker_name" required><br><br>
-            <label for="location">Location:</label>
-            <input type="text" name="location" id="location" required><br><br>
-            <label for="booker_contact">Contact:</label>
-            <input type="text" name="booker_contact" id="booker_contact" required><br><br>
-            <button type="submit">Save</button>
-        </form>
-    </div>
-</div>
-<?php
 $conn->close();
-?> 
-          </div>
-                </div>
-            </div>
-        </div>
-    </div>
+?>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
+
 
               </div>
-              
-                        
-                      </li>
-                    </ul>
-                  </nav>
-                </span>
-              </div>
-            </div>
-
-            <!-- Charts -->
-           
-                </div>
-              </div>
-            </div>
           </div>
         </main>
       </div>
     </div>
-
-
-<script>
-        function editRecord(booker_id, booker_name, location, booker_contact) {
-            document.getElementById('editModal').style.display = "block";
-            document.getElementById('booker_id').value = booker_id;
-            document.getElementById('booker_name').value = booker_name;
-            document.getElementById('location').value = location;
-            document.getElementById('booker_contact').value = booker_contact;
-        }
-
-        function closeModal() {
-            document.getElementById('editModal').style.display = "none";
-        }
-    </script>
-
   </body>
 </html>
