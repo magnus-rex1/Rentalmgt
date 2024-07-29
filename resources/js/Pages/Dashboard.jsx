@@ -1,3 +1,4 @@
+import Dropdown from '@/Components/Dropdown';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, usePage } from '@inertiajs/react';
 
@@ -16,6 +17,14 @@ export default function Dashboard({ auth }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">You're logged in!</div>
                     </div>
+                </div>
+            </div>
+            <div className="card mt-5 mx-auto max-w-7xl">
+                <div className="card-header">
+                    <div className="card-title">Card title</div>
+                </div>
+                <div className="card-body">
+                    <p>This is a card body</p>
                 </div>
             </div>
         </AuthenticatedLayout>
